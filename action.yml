@@ -1,8 +1,8 @@
-name: 'SecurityCodeScan'
-description: 'Security Code Scan action to add NuGet packages and set up projects'
+name: "SecurityCodeScan"
+description: "Security Code Scan action to add NuGet packages and set up projects"
 branding:
-  icon: 'check-circle'
-  color: 'purple'
+  icon: "check-circle"
+  color: "purple"
 runs:
   using: "composite"
   steps:
@@ -45,7 +45,7 @@ runs:
             Where-Object Include -like 'SecurityCodeScan*' |
             ForEach-Object { $_.SelectSingleNode('..').RemoveChild($_) | Out-Null }
 
-            $packageReference = $project.CreateElement('PackageReference')
+            $packageReference = $project.CreateElement('PackageReference', $project.Project.NamespaceURI)
             $packageReferenceInclude = $project.CreateAttribute('Include')
             $packageReferenceInclude.Value = $SecurityCodeScanPackageName
             $packageReference.Attributes.Append($packageReferenceInclude) | Out-Null
@@ -58,15 +58,15 @@ runs:
             $packageReferenceIncludeAssets = $project.CreateAttribute('IncludeAssets')
             $packageReferenceIncludeAssets.Value = 'runtime; build; native; contentfiles; analyzers; buildtransitive'
             $packageReference.Attributes.Append($packageReferenceIncludeAssets) | Out-Null
-            $itemGroup = $project.CreateElement('ItemGroup')
+            $itemGroup = $project.CreateElement('ItemGroup', $project.Project.NamespaceURI)
             $itemGroup.AppendChild($packageReference) | Out-Null
             $project.Project.AppendChild($itemGroup) | Out-Null
 
             # create RestoreProjectStyle element
             if (-not $project.Project.Sdk) {
-              $restoreProjectStyle = $project.CreateElement('RestoreProjectStyle')
+              $restoreProjectStyle = $project.CreateElement('RestoreProjectStyle', $project.Project.NamespaceURI)
               $restoreProjectStyle.InnerText = 'PackageReference'
-              $propertyGroup = $project.CreateElement('PropertyGroup')
+              $propertyGroup = $project.CreateElement('PropertyGroup', $project.Project.NamespaceURI)
               $propertyGroup.AppendChild($restoreProjectStyle) | Out-Null
               $project.Project.AppendChild($propertyGroup) | Out-Null
             }
